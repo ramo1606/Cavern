@@ -1,7 +1,22 @@
-cmake_minimum_required(VERSION 3.0)
-project(my_raylib_game CXX)
+cmake_minimum_required(VERSION 3.1.0)
+project(Cavern 
+		VERSION 1.0.0
+		DESCRIPTION "Bubble Bobble clone"
+		LANGUAGES CXX
+)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+#if (MSVC)
+#  set(CMAKE_CXX_FLAGS "/EHsc /std:c++17")
+#  set(CMAKE_CXX_FLAGS_DEBUG "/Od")
+#  set(CMAKE_CXX_FLAGS_RELEASE "/O2")
+#else ()
+#  set(CMAKE_CXX_FLAGS "-std=c++17")
+#  set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g")
+#  set(CMAKE_CXX_FLAGS_RELEASE "-O2")
+#endif ()
 
 # Adding Raylib
 include(FetchContent)
@@ -11,7 +26,7 @@ FetchContent_Declare(raylib GIT_REPOSITORY https://github.com/raysan5/raylib.git
 FetchContent_MakeAvailable(raylib)
 
 # Adding our source files
-file(GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_LIST_DIR}/src/*.cpp") # Define PROJECT_SOURCES as a list of all source files
+file(GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_LIST_DIR}/src/*.*") # Define PROJECT_SOURCES as a list of all source files
 set(PROJECT_INCLUDE "${CMAKE_CURRENT_LIST_DIR}/src/") # Define PROJECT_INCLUDE to be the path to the include directory of the project
 
 # Declaring our executable
