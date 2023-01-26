@@ -5,6 +5,7 @@
 
 #include "Common.h"
 #include "Player.h"
+#include "Fruit.h"
 
 using namespace Common;
 
@@ -20,6 +21,8 @@ public:
 	void init();
 	void update();
 	void draw();
+
+	Player* getPlayer() const;
 
 	void reset();
 
@@ -42,6 +45,8 @@ private:
 
 	std::vector<std::string> m_Grid{};
 	std::unique_ptr<Player> m_Player = nullptr;
+
+	std::vector<Fruit> m_Fruits{};
 
 	bool m_SpaceDown{ false };
 };

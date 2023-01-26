@@ -15,6 +15,14 @@ public:
 	void reset();
 	bool hitTest(CollideActor& other);
 
+	int getHealth() { return m_Health; }
+	int getLives() { return m_Lives; }
+	int getScore() { return m_Score; }
+
+	void setHealth(int health);
+	void setLives(int lives);
+	void setScore(int score);
+
 private:
 	int m_Lives{ 2 };
 	int m_Score{ 0 };

@@ -38,6 +38,24 @@ void Game::update()
 	{
 		m_Player->update();
 	}
+
+	for (int i = 0; i < m_Fruits.size(); i++) 
+	{
+		m_Fruits[i].update();
+	}
+
+	for (int i = 0; i < m_Fruits.size(); i++)
+	{
+		if (m_Fruits[i].isDead())
+		{
+			m_Fruits.erase(m_Fruits.begin() + i);
+		}
+	}
+
+	if (m_Timer % 200 == 0) 
+	{
+		m_Fruits.push_back(Fruit({ static_cast<float>(GetRandomValue(70, 730)), static_cast<float>(GetRandomValue(75, 400)) }));
+	}
 }
 
 void Game::draw()
@@ -68,6 +86,16 @@ void Game::draw()
 	{
 		m_Player->draw();
 	}
+
+	for (auto& fruit : m_Fruits)
+	{
+		fruit.draw();
+	}
+}
+
+Player* Game::getPlayer() const
+{
+	return m_Player.get();
 }
 
 void Game::reset()
@@ -98,6 +126,8 @@ void Game::nextLevel()
 	{
 		m_Player->reset();
 	}
+
+	m_Fruits.clear();
 }
 
 void Game::playSound(std::string& sound, bool isMenu)

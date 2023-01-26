@@ -32,7 +32,7 @@ void Actor::draw()
 {
 	if (m_Image) 
 	{
-		DrawTexture(*m_Image, m_Pos.x - m_Image->width * 0.5, m_Pos.y - m_Image->height * 0.5, WHITE);
+		DrawTexture(*m_Image, m_Pos.x - m_Image->width * 0.5f, m_Pos.y - m_Image->height * 0.5f, WHITE);
 	}
 }
 
@@ -43,5 +43,5 @@ Vector2 Actor::getPosition()
 
 Rectangle Actor::getImageRectangle()
 {
-	return m_ImageRectangle;
+	return {m_Pos.x - m_ImageRectangle.width * 0.5f, m_Pos.y - m_ImageRectangle.height * 0.5f, m_ImageRectangle.width, m_ImageRectangle.height };
 }

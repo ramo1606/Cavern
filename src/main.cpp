@@ -93,17 +93,6 @@ private:
     State m_State{ State::MENU };
     uint8_t m_NumPlayers{ 1 };
     std::shared_ptr<Game> m_Game = nullptr;
-
-    ECAVERN_SPRITES title_animation[10] = { ECAVERN_SPRITES::SPACE_0,
-                                            ECAVERN_SPRITES::SPACE_1,
-                                            ECAVERN_SPRITES::SPACE_2,
-                                            ECAVERN_SPRITES::SPACE_3,
-                                            ECAVERN_SPRITES::SPACE_4,
-                                            ECAVERN_SPRITES::SPACE_5,
-                                            ECAVERN_SPRITES::SPACE_6,
-                                            ECAVERN_SPRITES::SPACE_7,
-                                            ECAVERN_SPRITES::SPACE_8,
-                                            ECAVERN_SPRITES::SPACE_9 };
 };
 
 

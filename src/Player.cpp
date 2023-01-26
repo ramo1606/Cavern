@@ -135,3 +135,18 @@ bool Player::hitTest(CollideActor& other)
 
     return returnValue;
 }
+
+void Player::setHealth(int health)
+{
+    m_Health = health;
+}
+
+void Player::setLives(int lives)
+{
+    m_Lives = lives;
+}
+
+void Player::setScore(int score)
+{
+    m_Score = score;
+}
