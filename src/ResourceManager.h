@@ -14,14 +14,14 @@ public:
 	~ResourceManager();
 
 	bool loadResources();
-	static Texture2D* getSprite(ECAVERN_SPRITES obj);
-	static Sound* getSound(ECAVERN_SOUNDS obj);
-	static Music* getMusic(ECAVERN_MUSIC obj);
+	static Texture2D* getSprite(std::string& obj);
+	static Sound* getSound(std::string& obj);
+	static Music* getMusic(std::string& obj);
 	void cleanup();
 
 private:
 	static ResourceManager* m_Instance;
-	std::map<ECAVERN_SPRITES, Texture2D> m_SpritesMap;
-	std::map<ECAVERN_SOUNDS, Sound> m_SoundsMap;
-	std::map<ECAVERN_MUSIC, Music> m_MusicMap;
+	std::map<std::string, Texture2D> m_SpritesMap;
+	std::map<std::string, Sound> m_SoundsMap;
+	std::map<std::string, Music> m_MusicMap;
 };

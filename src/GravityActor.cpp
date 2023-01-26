@@ -10,7 +10,7 @@ void GravityActor::update(bool detect)
 
 	if (detect) 
 	{
-		if (move(0, std::signbit(m_VelY), std::fabs(m_VelY))) 
+		if (move(0, std::signbit(m_VelY) ? -1 : 1, std::fabs(m_VelY))) 
 		{
 			m_VelY = 0.f;
 			m_Landed = true;

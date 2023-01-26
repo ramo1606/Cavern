@@ -4,8 +4,9 @@
 #include <string> 
 
 #include "Common.h"
+#include "Player.h"
 
-class Player;
+using namespace Common;
 
 class Game
 {
@@ -15,28 +16,32 @@ public:
 	Game& operator=(const Game&) = delete;
 
 	static std::shared_ptr<Game> getInstance();
-	static std::shared_ptr<Game> getInstance(Player& player);
 
+	void init();
 	void update();
 	void draw();
 
-	void reset(int players);
+	void reset();
 
 	void nextLevel();
-	void playSound(Common::ECAVERN_SOUNDS sound, bool isMenu = false);
+	void playSound(std::string& sound, bool isMenu = false);
 
-	int getTimer() { return m_Timer; }
+	static int getTimer() { return m_Timer; }
 	const std::string& getGrid(int row);
 	static bool block(int x, int y);
+
+	bool spacePressed();
 
 private:
 	Game(Player* player = nullptr);
 	static std::shared_ptr<Game> m_Instance;
 
-	int m_Timer{ -1 };
+	static int m_Timer;
 	int m_LevelColour{ -1 };
 	int m_Level{ -1 };
 
 	std::vector<std::string> m_Grid{};
-	Player* m_Player = nullptr;
+	std::unique_ptr<Player> m_Player = nullptr;
+
+	bool m_SpaceDown{ false };
 };

@@ -19,9 +19,11 @@ public:
 	virtual void draw();
 
 	Vector2 getPosition();
+	Rectangle getImageRectangle();
 
 protected:
 	std::string m_Name{ "" };
 	Texture2D* m_Image = nullptr;
 	Vector2 m_Pos{ 0, 0 };
+	Rectangle m_ImageRectangle{ 0.f, 0.f, 0.f, 0.f };
 };

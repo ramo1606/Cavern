@@ -13,7 +13,7 @@ public:
 
 	void update(bool detect = true);
 
-private:
+protected:
 	bool m_Landed{ false };
 	float m_VelY{ 0.f };
 };

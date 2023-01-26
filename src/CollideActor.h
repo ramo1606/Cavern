@@ -11,5 +11,9 @@ public:
 
 	bool move(int dx, int dy, int speed);
 
-private:
+	void setDirectionX(float val) { m_DirectionX = val; }
+	float getDirectionX() { return m_DirectionX; }
+
+protected:
+	float m_DirectionX{ 0.f };
 };

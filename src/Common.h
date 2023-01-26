@@ -7,6 +7,7 @@ namespace Common
 {
     enum class ECAVERN_SPRITES : std::uint8_t
     {
+        EMPTY,
         BACKGROUND_0,
         BACKGROUND_1,
         BACKGROUND_2,

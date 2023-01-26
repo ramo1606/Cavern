@@ -3,6 +3,7 @@
 #include "Common.h"
 #include "ResourceManager.h"
 #include "Game.h"
+#include "Player.h"
 
 using namespace Common;
 
@@ -23,20 +24,13 @@ public:
 
     void update()
     {
-        bool space_pressed = false;
-        if (IsKeyDown(KEY_SPACE) && !m_SpaceDown)
-        {
-            space_pressed = true;
-        }
-
-        m_SpaceDown = IsKeyDown(KEY_SPACE);
-
         switch (m_State)
         {
         case State::MENU:
-            if (space_pressed)
+            if (m_Game->spacePressed())
             {
                 m_State = State::PLAY;
+                m_Game->init();
             }
             else
             {
@@ -45,20 +39,21 @@ public:
             break;
         case State::PLAY:
             //Has anyone won?
-            if (space_pressed)
+            if (m_Game->spacePressed())
             {
                 m_State = State::GAME_OVER;
             }
             else
             {
-
+                m_Game->update();
             }
             break;
         case State::GAME_OVER:
-            if (space_pressed)
+            if (m_Game->spacePressed())
             {
                 //Reset to menu state
                 m_State = State::MENU;
+                m_Game->reset();
             }
             break;
         default:
@@ -71,19 +66,21 @@ public:
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
+        m_Game->draw();
+
         switch (m_State)
         {
         case State::MENU:
             {
-                DrawTexture(*ResourceManager::getSprite(ECAVERN_SPRITES::TITLE), 0, 0, WHITE);
+            DrawTexture(*ResourceManager::getSprite(std::string("title")), 0, 0, WHITE);
                 int animFrame = std::min(((m_Game->getTimer() + 40) % 160) / 4, 9);
-                DrawTexture(*ResourceManager::getSprite(title_animation[animFrame]), 130, 280, WHITE);
+                DrawTexture(*ResourceManager::getSprite(std::string("space") + std::to_string(animFrame)), 130, 280, WHITE);
                 break;
             }
         case State::PLAY:
             break;
         case State::GAME_OVER:
-            DrawTexture(*ResourceManager::getSprite(ECAVERN_SPRITES::OVER), 0, 0, WHITE);
+            DrawTexture(*ResourceManager::getSprite(std::string("over")), 0, 0, WHITE);
             break;
         default:
             break;
@@ -121,12 +118,12 @@ int main(void)
 
     Cavern cavern;
 
-    PlayMusicStream(*ResourceManager::getMusic(ECAVERN_MUSIC::THEME));
-    SetMusicVolume(*ResourceManager::getMusic(ECAVERN_MUSIC::THEME), 0.5f);
+    PlayMusicStream(*ResourceManager::getMusic(std::string("theme")));
+    SetMusicVolume(*ResourceManager::getMusic(std::string("theme")), 0.5f);
 
     while (!WindowShouldClose())
     {
-        UpdateMusicStream(*ResourceManager::getMusic(ECAVERN_MUSIC::THEME));
+        UpdateMusicStream(*ResourceManager::getMusic(std::string("theme")));
         cavern.update();
         cavern.draw();
     }
