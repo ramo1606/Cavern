@@ -6,6 +6,10 @@
 #include "Common.h"
 #include "Player.h"
 #include "Fruit.h"
+#include "Robot.h"
+#include "Pop.h"
+#include "Orb.h"
+#include "Bolt.h"
 
 using namespace Common;
 
@@ -27,13 +31,23 @@ public:
 	void reset();
 
 	void nextLevel();
-	void playSound(std::string& sound, bool isMenu = false);
+	void playSound(std::string& sound, int count = 1);
 
+	int getLevel() { return m_Level; }
 	static int getTimer() { return m_Timer; }
 	const std::string& getGrid(int row);
 	static bool block(int x, int y);
 
 	bool spacePressed();
+	float fireProbability();
+	int maxEnemies();
+	int getRobotSpawnX();
+
+	void addPop(Pop&& pop);
+	void addFruit(Fruit&& fruit);
+
+	std::vector<Orb>& getOrbs() { return m_Orbs; }
+	std::vector<Bolt>& getBolts() { return m_Bolts; }
 
 private:
 	Game(Player* player = nullptr);
@@ -47,6 +61,11 @@ private:
 	std::unique_ptr<Player> m_Player = nullptr;
 
 	std::vector<Fruit> m_Fruits{};
+	std::vector<Robot> m_Enemies{};
+	std::vector<Pop> m_Pops{};
+	std::vector<Orb> m_Orbs{};
+	std::vector<Bolt> m_Bolts{};
+	std::vector<ROBOT_TYPE> m_PendingEnemies{};
 
 	bool m_SpaceDown{ false };
 };

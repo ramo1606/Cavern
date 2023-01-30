@@ -1,6 +1,10 @@
 #include "Game.h"
 #include "ResourceManager.h"
 
+#include <cmath>
+#include <algorithm>
+#include <random>
+
 int Game::m_Timer = -1;
 std::shared_ptr<Game> Game::m_Instance = nullptr;
 
@@ -44,17 +48,114 @@ void Game::update()
 		m_Fruits[i].update();
 	}
 
-	for (int i = 0; i < m_Fruits.size(); i++)
+	for (int i = 0; i < m_Enemies.size(); i++)
 	{
-		if (m_Fruits[i].isDead())
+		m_Enemies[i].update();
+	}
+
+	for (int i = 0; i < m_Bolts.size(); i++)
+	{
+		m_Bolts[i].update();
+	}
+
+	for (int i = 0; i < m_Orbs.size(); i++)
+	{
+		m_Orbs[i].update();
+	}
+
+	for (int i = 0; i < m_Pops.size(); i++)
+	{
+		m_Pops[i].update();
+	}
+
+	auto fruitIt = m_Fruits.begin();
+	while (fruitIt != m_Fruits.end())
+	{
+		if (fruitIt->isDead())
 		{
-			m_Fruits.erase(m_Fruits.begin() + i);
+			fruitIt = m_Fruits.erase(fruitIt);
+		}
+		else {
+			++fruitIt;
 		}
 	}
 
-	if (m_Timer % 200 == 0) 
+	auto enemyIt = m_Enemies.begin();
+	while (enemyIt != m_Enemies.end())
+	{
+		if (!enemyIt->isAlive())
+		{
+			enemyIt = m_Enemies.erase(enemyIt);
+		}
+		else {
+			++enemyIt;
+		}
+	}
+
+	auto boltsIt = m_Bolts.begin();
+	while (boltsIt != m_Bolts.end())
+	{
+		if (!boltsIt->isActive())
+		{
+			boltsIt = m_Bolts.erase(boltsIt);
+		}
+		else {
+			++boltsIt;
+		}
+	}
+
+	auto orbsIt = m_Orbs.begin();
+	while (orbsIt != m_Orbs.end())
+	{
+		if (orbsIt->getTimer() > 250 || orbsIt->getPosition().y < -40)
+		{
+			orbsIt = m_Orbs.erase(orbsIt);
+		}
+		else {
+			++orbsIt;
+		}
+	}
+
+	auto popsIt = m_Pops.begin();
+	while (popsIt != m_Pops.end())
+	{
+		if (!popsIt->isAlive())
+		{
+			popsIt = m_Pops.erase(popsIt);
+		}
+		else {
+			++popsIt;
+		}
+	}
+
+	if (m_Timer % 100 == 0 && m_PendingEnemies.size() + m_Enemies.size() > 0) 
 	{
 		m_Fruits.push_back(Fruit({ static_cast<float>(GetRandomValue(70, 730)), static_cast<float>(GetRandomValue(75, 400)) }));
+	}
+
+	if (m_Timer % 81 == 0 && m_PendingEnemies.size() > 0 && m_Enemies.size() < maxEnemies())
+	{
+		ROBOT_TYPE robotType = m_PendingEnemies.back();
+		Vector2 position = { getRobotSpawnX(), -30 };
+		m_Enemies.push_back(Robot(position, robotType));
+		m_PendingEnemies.pop_back();
+	}
+
+	if (m_PendingEnemies.size() + m_Enemies.size() + m_Pops.size() == 0)
+	{
+		int counter = 0;
+		for (int i = 0; i < m_Orbs.size(); i++)
+		{
+			if (m_Orbs[i].getTrappedEnemyType() != ROBOT_TYPE::NONE)
+			{
+				counter++;
+			}
+		}
+		
+		if (counter == 0) 
+		{
+			nextLevel();
+		}
 	}
 }
 
@@ -90,6 +191,26 @@ void Game::draw()
 	for (auto& fruit : m_Fruits)
 	{
 		fruit.draw();
+	}
+
+	for (auto& enemy : m_Enemies)
+	{
+		enemy.draw();
+	}
+
+	for (auto& bolt : m_Bolts)
+	{
+		bolt.draw();
+	}
+
+	for (auto& orb : m_Orbs)
+	{
+		orb.draw();
+	}
+
+	for (auto& pop : m_Pops)
+	{
+		pop.draw();
 	}
 }
 
@@ -128,13 +249,33 @@ void Game::nextLevel()
 	}
 
 	m_Fruits.clear();
+	m_Enemies.clear();
+
+	int numEnemies = 10 + m_Level;
+	int numStrongEnemies = 1 + static_cast<int>(m_Level / 1.5f);
+	int numWeakEnemies = numEnemies - numStrongEnemies;
+
+	for (int i = 0; i < numStrongEnemies; i++) 
+	{
+		m_PendingEnemies.push_back(ROBOT_TYPE::AGRESSIVE);
+	}
+	for (int i = 0; i < numWeakEnemies; i++)
+	{
+		m_PendingEnemies.push_back(ROBOT_TYPE::NORMAL);
+	}
+
+	auto rd = std::random_device{};
+	auto rng = std::default_random_engine{ rd() };
+	std::shuffle(std::begin(m_PendingEnemies), std::end(m_PendingEnemies), rng);
+
+	playSound(std::string("level"), 1);
 }
 
-void Game::playSound(std::string& sound, bool isMenu)
+void Game::playSound(std::string& sound, int count)
 {
-	if (m_Player || isMenu)
+	if (m_Player)
 	{
-		PlaySound(*ResourceManager::getSound(sound));
+		PlaySound(*ResourceManager::getSound(sound + std::to_string(GetRandomValue(0, count - 1))));
 	}
 }
 
@@ -163,17 +304,54 @@ bool Game::block(int x, int y)
 bool Game::spacePressed()
 {
 	bool returnValue = false;
-	if (IsKeyDown(KEY_SPACE)) 
+	if (IsKeyDown(KEY_SPACE) || IsGamepadButtonDown(0, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT))
 	{
-		if (!m_SpaceDown) 
+		if (!m_SpaceDown)
 		{
 			m_SpaceDown = true;
 			returnValue = true;
 		}
 	}
-	else 
+	else
 	{
 		m_SpaceDown = false;
 	}
+
 	return returnValue;
+}
+
+float Game::fireProbability()
+{
+	return 0.001f + (0.0001f * std::min(100, m_Level));
+}
+
+int Game::maxEnemies()
+{
+	return std::min((m_Level + 6) / 2, 8);
+}
+
+int Game::getRobotSpawnX()
+{
+	int r = GetRandomValue(0, NUM_COLUMNS - 1);
+
+	for (int i = 0; i < NUM_COLUMNS; ++i) 
+	{
+		int gridX = (r + i) % NUM_COLUMNS;
+		if (m_Grid[0][gridX] == ' ')
+		{
+			return GRID_BLOCK_SIZE * gridX + LEVEL_X_OFFSET + 12;
+		}
+	}
+
+	return WIDTH * 0.5;
+}
+
+void Game::addPop(Pop&& pop)
+{
+	m_Pops.push_back(pop);
+}
+
+void Game::addFruit(Fruit&& fruit)
+{
+	m_Fruits.push_back(fruit);
 }

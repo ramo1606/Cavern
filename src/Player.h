@@ -1,6 +1,8 @@
 #pragma once
 #include "GravityActor.h"
 
+class Orb;
+
 class Player : public GravityActor 
 {
 public:
@@ -30,5 +32,5 @@ private:
 	int m_HurtTimer{ 100 };
 	int m_Health{ 3 };
 	int m_Dx{ 0 };
-	//Orb* m_BlowingOrb{nullptr};
+	Orb* m_BlowingOrb{nullptr};
 };

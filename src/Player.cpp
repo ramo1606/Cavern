@@ -2,6 +2,7 @@
 #include "ResourceManager.h"
 #include "Game.h"
 
+
 Player::Player(Vector2 pos, Texture2D* image) : GravityActor(pos, image)
 {
     setImage(*ResourceManager::getSprite(std::string("still")));
@@ -39,6 +40,22 @@ void Player::update()
         processInput();
     }
 
+    if (IsKeyDown(KEY_SPACE) || IsGamepadButtonDown(0, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT))
+    {
+        if (m_BlowingOrb) 
+        {
+            m_BlowingOrb->setBlownFrames(m_BlowingOrb->getBlownFrames() + 4);
+            if (m_BlowingOrb->getBlownFrames() >= 120) 
+            {
+                m_BlowingOrb = nullptr;
+            }
+        }
+    }
+    else 
+    {
+        m_BlowingOrb = nullptr;
+    }
+
     setImage(*ResourceManager::getSprite(std::string("blank")));
 
     if (m_HurtTimer <= 0 || m_HurtTimer % 2 == 1) 
@@ -74,11 +91,11 @@ void Player::update()
 void Player::processInput()
 {
     m_Dx = 0;
-    if (IsKeyDown(KEY_LEFT)) 
+    if (IsKeyDown(KEY_LEFT) || GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_X) == -1)
     {
         m_Dx = -1;
     }
-    else if (IsKeyDown(KEY_RIGHT))
+    else if (IsKeyDown(KEY_RIGHT) || GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_X) == 1)
     {
         m_Dx = 1;
     }
@@ -93,11 +110,23 @@ void Player::processInput()
         }
     }
 
-    if (IsKeyDown(KEY_UP) && m_VelY == 0 && m_Landed) 
+    if (Game::getInstance()->spacePressed() && m_FireTimer <= 0 && Game::getInstance()->getOrbs().size() < 5)
+    {
+        float x = std::min(730, std::max(70, static_cast<int>(m_Pos.x + m_DirectionX * 38)));
+        float y = m_Pos.y - 10;
+
+        auto& orbs = Game::getInstance()->getOrbs();
+        orbs.push_back(Orb({ x, y }, m_DirectionX));
+        m_BlowingOrb = &orbs.back();
+        Game::getInstance()->playSound(std::string("blow"), 4);
+        m_FireTimer = 20;
+    }
+
+    if ((IsKeyDown(KEY_UP) || IsGamepadButtonDown(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN)) && m_VelY == 0 && m_Landed)
     {
         m_VelY = -16;
         m_Landed = false;
-        //Play sound
+        Game::getInstance()->playSound(std::string("jump"));
     }
 }
 
@@ -109,7 +138,7 @@ void Player::reset()
     m_FireTimer = 0;
     m_HurtTimer = 100;
     m_Health = 3;
-    //m_BlowingOrb = None;
+    m_BlowingOrb = nullptr;
 }
 
 bool Player::hitTest(CollideActor& other)
@@ -125,10 +154,12 @@ bool Player::hitTest(CollideActor& other)
         if (m_Health > 0) 
         {
             //Play sound
+            Game::getInstance()->playSound(std::string("ouch"), 4);
         }
         else 
         {
             //Play sound
+            Game::getInstance()->playSound(std::string("die"));
         }
         returnValue = true;
     }

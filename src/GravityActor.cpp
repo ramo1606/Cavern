@@ -15,7 +15,7 @@ void GravityActor::update(bool detect)
 			m_VelY = 0.f;
 			m_Landed = true;
 		}
-		if (m_Pos.y >= Common::HEIGHT) 
+		if (m_Pos.y - getImageRectangle().height * 0.5f >= Common::HEIGHT)
 		{
 			m_Pos.y = 1;
 		}

@@ -17,7 +17,14 @@ namespace Common
     enum class ROBOT_TYPE : std::uint8_t
     {
         NORMAL,
-        AGRESSIVE
+        AGRESSIVE,
+        NONE
+    };
+
+    enum class POP_TYPE : std::uint8_t
+    {
+        FRUIT,
+        ENEMY
     };
 
     const std::string TITLE = "Cavern";
@@ -27,10 +34,13 @@ namespace Common
 
     constexpr int NUM_ROWS = 18;
     constexpr int NUM_COLUMNS = 28;
+
     constexpr int LEVEL_X_OFFSET = 50;
     constexpr int GRID_BLOCK_SIZE = 25;
-    //const Anchor ANCHOR_CENTRE = { "center", "center" };
-    //const Anchor ANCHOR_CENTRE_BOTTOM = { "center", "bottom" };
+
+    const char CHAR_WIDTH[] = { 27, 26, 25, 26, 25, 25, 26, 25, 12, 26, 26, 25, 33, 25, 26,
+                                25, 27, 26, 26, 25, 26, 26, 38, 25, 25, 25 };
+
     const std::vector<std::vector<std::string>> LEVELS = { {"XXXXX     XXXXXXXX     XXXXX",
                                                             "", "", "", "",
                                                             "   XXXXXXX        XXXXXXX   ",
