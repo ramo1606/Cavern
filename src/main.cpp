@@ -98,7 +98,7 @@ public:
     {
         int numberWidth = CHAR_WIDTH[0];
         std::string score = std::to_string(m_Game->getPlayer()->getScore());
-        drawText(score, 451, WIDTH - 2 - (numberWidth * score.length()));
+        drawText(score, 451, WIDTH - 2 - (numberWidth * score.size()));
 
         drawText(std::string("LEVEL ") + std::to_string(m_Game->getLevel() + 1), 451);
 
@@ -135,7 +135,7 @@ public:
 
     void drawText(std::string& text, int y, int x = -1) 
     {
-        int imageX = 0;
+        int imageX = x;
         if (x <= -1) 
         {
             int sum = 0;
