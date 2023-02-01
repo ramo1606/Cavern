@@ -1,3 +1,4 @@
+#define RMEM_IMPLEMENTATION
 #include "Bolt.h"
 #include "Orb.h"
 #include "Game.h"
@@ -16,9 +17,9 @@ void Bolt::update()
 	}
 	else 
 	{
-		for (Orb& orb : Game::getInstance()->getOrbs()) 
+		for (Orb* orb : Game::getInstance()->getOrbs()) 
 		{
-			if (orb.hitTest(*this)) 
+			if (orb->hitTest(*this)) 
 			{
 				m_Active = false;
 				break;
@@ -36,5 +37,5 @@ void Bolt::update()
 
 	std::string directionIndex = m_DirectionX > 0 ? std::to_string(1) : std::to_string(0);
 	std::string animFrame = std::to_string((Game::getInstance()->getTimer() / 4) % 2);
-	setImage(*ResourceManager::getSprite(std::string("bolt") + directionIndex + animFrame));
+	setImage(*ResourceManager::getSprite(std::string("bolt") + directionIndex + animFrame), true);
 }

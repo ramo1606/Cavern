@@ -29,10 +29,10 @@ void Orb::update()
 	}
 	else if (m_Timer >= MAX_TIMER || m_Pos.y <= -40) 
 	{
-		Game::getInstance()->addPop(Pop(m_Pos, POP_TYPE::ENEMY));
+		Game::getInstance()->addPop(m_Pos, POP_TYPE::ENEMY);
 		if (m_TrappedEnemyType != ROBOT_TYPE::NONE) 
 		{
-			Game::getInstance()->addFruit(Fruit(m_Pos, m_TrappedEnemyType));
+			Game::getInstance()->addFruit(m_Pos, m_TrappedEnemyType);
 		}
 		Game::getInstance()->playSound(std::string("pop"), 4);
 	}
@@ -54,12 +54,12 @@ void Orb::update()
 		}
 	}
 
-	setImage(*ResourceManager::getSprite(image));
+	setImage(*ResourceManager::getSprite(image), true);
 }
 
 bool Orb::hitTest(Bolt& bolt)
 {
-	bool collided = CheckCollisionPointRec(bolt.getPosition(), getImageRectangle());
+	bool collided = CheckCollisionPointRec(bolt.getPosition(), getActorRectangle());
 	if(collided)
 	{
 		m_Timer = MAX_TIMER - 1;

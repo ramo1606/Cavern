@@ -6,6 +6,11 @@ CollideActor::CollideActor(Vector2 pos, Texture2D* image) : Actor("CollideActor"
 {
 }
 
+void CollideActor::update()
+{
+	Actor::update();
+}
+
 bool CollideActor::move(int dx, int dy, int speed)
 {
 	int newX = static_cast<int>(m_Pos.x);
@@ -16,7 +21,7 @@ bool CollideActor::move(int dx, int dy, int speed)
 		newX += dx;
 		newY += dy;
 
-		int actorBottom = newY + static_cast<int>(getImageRectangle().height * 0.5);
+		int actorBottom = newY + static_cast<int>(getActorRectangle().height * 0.5f);
 		
 		if (newX < 70 || newX > 730)
 			return true;

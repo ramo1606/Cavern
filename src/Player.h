@@ -17,9 +17,9 @@ public:
 	void reset();
 	bool hitTest(CollideActor& other);
 
-	int getHealth() { return m_Health; }
-	int getLives() { return m_Lives; }
-	int getScore() { return m_Score; }
+	int getHealth() const { return m_Health; }
+	int getLives() const { return m_Lives; }
+	int getScore() const { return m_Score; }
 
 	void setHealth(int health);
 	void setLives(int lives);

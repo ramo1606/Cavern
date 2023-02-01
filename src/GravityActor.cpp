@@ -6,6 +6,7 @@ GravityActor::GravityActor(Vector2 pos, Texture2D* image) : CollideActor(pos, im
 
 void GravityActor::update(bool detect)
 {
+	CollideActor::update();
 	m_VelY = std::fmin(m_VelY + 1.f, MAX_FALL_SPEED);
 
 	if (detect) 
@@ -15,7 +16,7 @@ void GravityActor::update(bool detect)
 			m_VelY = 0.f;
 			m_Landed = true;
 		}
-		if (m_Pos.y - getImageRectangle().height * 0.5f >= Common::HEIGHT)
+		if (top() >= Common::HEIGHT)
 		{
 			m_Pos.y = 1;
 		}

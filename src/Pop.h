@@ -12,7 +12,7 @@ public:
 	virtual ~Pop() = default;
 
 	void update() override;
-	bool isAlive() { return m_Timer < 12; }
+	bool isAlive() const { return m_Timer < 12; }
 
 private:
 	POP_TYPE m_Type{ POP_TYPE::FRUIT };

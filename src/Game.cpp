@@ -45,34 +45,38 @@ void Game::update()
 
 	for (int i = 0; i < m_Fruits.size(); i++) 
 	{
-		m_Fruits[i].update();
+		m_Fruits[i]->update();
 	}
 
 	for (int i = 0; i < m_Enemies.size(); i++)
 	{
-		m_Enemies[i].update();
+		m_Enemies[i]->update();
 	}
 
 	for (int i = 0; i < m_Bolts.size(); i++)
 	{
-		m_Bolts[i].update();
+		m_Bolts[i]->update();
 	}
 
 	for (int i = 0; i < m_Orbs.size(); i++)
 	{
-		m_Orbs[i].update();
+		m_Orbs[i]->update();
 	}
 
 	for (int i = 0; i < m_Pops.size(); i++)
 	{
-		m_Pops[i].update();
+		m_Pops[i]->update();
 	}
 
 	auto fruitIt = m_Fruits.begin();
 	while (fruitIt != m_Fruits.end())
 	{
-		if (fruitIt->isDead())
+		Fruit* fruit = *fruitIt;
+		if (fruit->isDead())
 		{
+			fruit->~Fruit();
+			ObjPoolFree(&m_FruitsPool, fruit);
+			fruit = nullptr;
 			fruitIt = m_Fruits.erase(fruitIt);
 		}
 		else {
@@ -83,8 +87,12 @@ void Game::update()
 	auto enemyIt = m_Enemies.begin();
 	while (enemyIt != m_Enemies.end())
 	{
-		if (!enemyIt->isAlive())
+		Robot* enemy = *enemyIt;
+		if (!enemy->isAlive())
 		{
+			enemy->~Robot();
+			ObjPoolFree(&m_EnemiesPool, enemy);
+			enemy = nullptr;
 			enemyIt = m_Enemies.erase(enemyIt);
 		}
 		else {
@@ -95,8 +103,12 @@ void Game::update()
 	auto boltsIt = m_Bolts.begin();
 	while (boltsIt != m_Bolts.end())
 	{
-		if (!boltsIt->isActive())
+		Bolt* bolt = *boltsIt;
+		if (!bolt->isActive())
 		{
+			bolt->~Bolt();
+			ObjPoolFree(&m_BoltsPool, bolt);
+			bolt = nullptr;
 			boltsIt = m_Bolts.erase(boltsIt);
 		}
 		else {
@@ -107,8 +119,12 @@ void Game::update()
 	auto orbsIt = m_Orbs.begin();
 	while (orbsIt != m_Orbs.end())
 	{
-		if (orbsIt->getTimer() > 250 || orbsIt->getPosition().y < -40)
+		Orb* orb = *orbsIt;
+		if (orb->getTimer() > 250 || orb->getPosition().y < -40)
 		{
+			orb->~Orb();
+			ObjPoolFree(&m_OrbsPool, orb);
+			orb = nullptr;
 			orbsIt = m_Orbs.erase(orbsIt);
 		}
 		else {
@@ -119,8 +135,12 @@ void Game::update()
 	auto popsIt = m_Pops.begin();
 	while (popsIt != m_Pops.end())
 	{
-		if (!popsIt->isAlive())
+		Pop* pop = *popsIt;
+		if (!pop->isAlive())
 		{
+			pop->~Pop();
+			ObjPoolFree(&m_PopsPool, pop);
+			pop = nullptr;
 			popsIt = m_Pops.erase(popsIt);
 		}
 		else {
@@ -130,14 +150,18 @@ void Game::update()
 
 	if (m_Timer % 100 == 0 && m_PendingEnemies.size() + m_Enemies.size() > 0) 
 	{
-		m_Fruits.push_back(Fruit({ static_cast<float>(GetRandomValue(70, 730)), static_cast<float>(GetRandomValue(75, 400)) }));
+		addFruit({ static_cast<float>(GetRandomValue(70, 730)), static_cast<float>(GetRandomValue(75, 400)) });
 	}
 
 	if (m_Timer % 81 == 0 && m_PendingEnemies.size() > 0 && m_Enemies.size() < maxEnemies())
 	{
 		ROBOT_TYPE robotType = m_PendingEnemies.back();
 		Vector2 position = { getRobotSpawnX(), -30 };
-		m_Enemies.push_back(Robot(position, robotType));
+
+		Robot* newEnemy = static_cast<Robot*>(ObjPoolAlloc(&m_EnemiesPool));
+		new(newEnemy) Robot(position, robotType);
+		
+		m_Enemies.push_back(newEnemy);
 		m_PendingEnemies.pop_back();
 	}
 
@@ -146,7 +170,7 @@ void Game::update()
 		int counter = 0;
 		for (int i = 0; i < m_Orbs.size(); i++)
 		{
-			if (m_Orbs[i].getTrappedEnemyType() != ROBOT_TYPE::NONE)
+			if (m_Orbs[i]->getTrappedEnemyType() != ROBOT_TYPE::NONE)
 			{
 				counter++;
 			}
@@ -190,27 +214,27 @@ void Game::draw()
 
 	for (auto& fruit : m_Fruits)
 	{
-		fruit.draw();
+		fruit->draw();
 	}
 
 	for (auto& enemy : m_Enemies)
 	{
-		enemy.draw();
+		enemy->draw();
 	}
 
 	for (auto& bolt : m_Bolts)
 	{
-		bolt.draw();
+		bolt->draw();
 	}
 
 	for (auto& orb : m_Orbs)
 	{
-		orb.draw();
+		orb->draw();
 	}
 
 	for (auto& pop : m_Pops)
 	{
-		pop.draw();
+		pop->draw();
 	}
 }
 
@@ -230,6 +254,60 @@ void Game::reset()
 	m_Player.reset();
 	m_Player = nullptr;
 
+	//clear memory
+	auto fruitIt = m_Fruits.begin();
+	while (fruitIt != m_Fruits.end())
+	{
+		Fruit* fruit = *fruitIt;
+		fruit->~Fruit();
+		ObjPoolCleanUp(&m_FruitsPool, (void**)&fruit);
+		++fruitIt;
+	}
+
+	auto enemyIt = m_Enemies.begin();
+	while (enemyIt != m_Enemies.end())
+	{
+		Robot* enemy = *enemyIt;
+		enemy->~Robot();
+		ObjPoolCleanUp(&m_EnemiesPool, (void**)&enemy);
+		++enemyIt;
+	}
+
+	auto boltsIt = m_Bolts.begin();
+	while (boltsIt != m_Bolts.end())
+	{
+		Bolt* bolt = *boltsIt;
+		bolt->~Bolt();
+		ObjPoolCleanUp(&m_BoltsPool, (void**)&bolt);
+		++boltsIt;
+	}
+
+	auto orbsIt = m_Orbs.begin();
+	while (orbsIt != m_Orbs.end())
+	{
+		Orb* orb = *orbsIt;
+		orb->~Orb();
+		ObjPoolCleanUp(&m_OrbsPool, (void**)&orb);
+		++orbsIt;
+	}
+
+	auto popsIt = m_Pops.begin();
+	while (popsIt != m_Pops.end())
+	{
+		Pop* pop = *popsIt;
+		pop->~Pop();
+		ObjPoolCleanUp(&m_PopsPool, (void**)&pop);
+		++popsIt;
+	}
+
+	//clear containers
+	m_Fruits.clear();
+	m_Enemies.clear();
+	m_Pops.clear();
+	m_Orbs.clear();
+	m_Bolts.clear();
+	m_PendingEnemies.clear();
+	
 	nextLevel();
 }
 
@@ -246,6 +324,24 @@ void Game::nextLevel()
 	if (m_Player) 
 	{
 		m_Player->reset();
+	}
+
+	auto fruitIt = m_Fruits.begin();
+	while (fruitIt != m_Fruits.end())
+	{
+		Fruit* fruit = *fruitIt;
+		fruit->~Fruit();
+		ObjPoolCleanUp(&m_FruitsPool, (void**)&fruit);
+		++fruitIt;
+	}
+
+	auto enemyIt = m_Enemies.begin();
+	while (enemyIt != m_Enemies.end())
+	{
+		Robot* enemy = *enemyIt;
+		enemy->~Robot();
+		ObjPoolCleanUp(&m_EnemiesPool, (void**)&enemy);
+		++enemyIt;
 	}
 
 	m_Fruits.clear();
@@ -346,12 +442,34 @@ int Game::getRobotSpawnX()
 	return WIDTH * 0.5;
 }
 
-void Game::addPop(Pop&& pop)
+void Game::addPop(Vector2 pos, POP_TYPE type)
 {
-	m_Pops.push_back(pop);
+	Pop* newPop = static_cast<Pop*>(ObjPoolAlloc(&m_PopsPool));
+	new(newPop) Pop(pos, type);
+
+	m_Pops.push_back(newPop);
 }
 
-void Game::addFruit(Fruit&& fruit)
+void Game::addBolt(Vector2 pos, float dirX)
 {
-	m_Fruits.push_back(fruit);
+	Bolt* newBolt = static_cast<Bolt*>(ObjPoolAlloc(&m_BoltsPool));
+	new(newBolt) Bolt(pos, dirX);
+
+	m_Bolts.push_back(newBolt);
+}
+
+void Game::addOrbs(Vector2 pos, float dirX)
+{
+	Orb* newOrb = static_cast<Orb*>(ObjPoolAlloc(&m_OrbsPool));
+	new(newOrb) Orb(pos, dirX);
+
+	m_Orbs.push_back(newOrb);
+}
+
+void Game::addFruit(Vector2 pos, ROBOT_TYPE trapped_enemy_type)
+{
+	Fruit* newFruit = static_cast<Fruit*>(ObjPoolAlloc(&m_FruitsPool));
+	new(newFruit) Fruit(pos, trapped_enemy_type);
+
+	m_Fruits.push_back(newFruit);
 }

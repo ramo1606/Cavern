@@ -7,16 +7,16 @@ Actor::Actor(std::string name, Vector2 pos, Texture2D* image)
 {
 	if (m_Image) 
 	{
-		m_ImageRectangle = { m_Pos.x, m_Pos.y, static_cast<float>(m_Image->width), static_cast<float>(m_Image->height) };
+		setActorSize();
 	}
 }
 
-void Actor::setImage(Texture2D& image)
+void Actor::setImage(Texture2D& image, bool resizeActor)
 {
 	m_Image = &image;
-	if (m_Image->width > m_ImageRectangle.width && m_Image->height > m_ImageRectangle.height)
+	if (resizeActor) 
 	{
-		m_ImageRectangle = { m_Pos.x, m_Pos.y, static_cast<float>(m_Image->width), static_cast<float>(m_Image->height) };
+		setActorSize();
 	}
 }
 
@@ -32,16 +32,39 @@ void Actor::draw()
 {
 	if (m_Image) 
 	{
-		DrawTexture(*m_Image, m_Pos.x - m_Image->width * 0.5f, m_Pos.y - m_Image->height * 0.5f, WHITE);
+		DrawTexture(*m_Image, left(), top(), WHITE);
 	}
 }
 
-Vector2 Actor::getPosition()
+Vector2 Actor::getPosition() const
 {
 	return m_Pos;
 }
 
-Rectangle Actor::getImageRectangle()
+Rectangle Actor::getActorRectangle()
 {
-	return {m_Pos.x - m_ImageRectangle.width * 0.5f, m_Pos.y - m_ImageRectangle.height * 0.5f, m_ImageRectangle.width, m_ImageRectangle.height };
+	return { left(), top(), static_cast<float>(getWidht()), static_cast<float>(getHeight())};
+}
+
+int Actor::getWidht()
+{
+	return m_ActorSize.width;
+}
+
+int Actor::getHeight()
+{
+	return m_ActorSize.height;
+}
+
+const std::string& Actor::getName() const
+{
+	return m_Name;
+}
+
+void Actor::setActorSize()
+{
+	if (m_Image)
+	{
+		m_ActorSize = { m_Image->width, m_Image->height };
+	}
 }

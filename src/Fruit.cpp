@@ -36,7 +36,7 @@ void Fruit::update()
 	GravityActor::update();
 
 	Player* gamePlayer = Game::getInstance()->getPlayer();
-	if (gamePlayer && CheckCollisionPointRec(getPosition(), gamePlayer->getImageRectangle()))
+	if (gamePlayer && CheckCollisionPointRec(getPosition(), gamePlayer->getActorRectangle()))
 	{
 		switch (m_Type)
 		{
@@ -63,10 +63,10 @@ void Fruit::update()
 	if(m_TimeToLive <= 0) 
 	{
 		// Create 'pop' animation
-		Game::getInstance()->addPop(Pop({ m_Pos.x, m_Pos.y }, POP_TYPE::FRUIT));
+		Game::getInstance()->addPop({ m_Pos.x, m_Pos.y }, POP_TYPE::FRUIT);
 	}
 
 	std::string frames[4] = { std::to_string(0), std::to_string(1) , std::to_string(2), std::to_string(1) };
 	std::string animFrame = frames[(Game::getInstance()->getTimer() / 6) % 4];
-	setImage(*ResourceManager::getSprite(std::string("fruit") + std::to_string(static_cast<int>(m_Type)) + animFrame));
+	setImage(*ResourceManager::getSprite(std::string("fruit") + std::to_string(static_cast<int>(m_Type)) + animFrame), true);
 }

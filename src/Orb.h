@@ -20,9 +20,10 @@ public:
 	void setTrappedEnemyType(ROBOT_TYPE type) { m_TrappedEnemyType = type; }
 	void setBlownFrames(int value) { m_BlownFrames = value; }
 	void setFloating(bool isFloating) { m_Floating = isFloating; }
-	int getBlownFrames() { return m_BlownFrames; }
-	ROBOT_TYPE getTrappedEnemyType() { return m_TrappedEnemyType; }
-	int getTimer() { return m_Timer; };
+	
+	int getTimer() const{ return m_Timer; };
+	int getBlownFrames() const { return m_BlownFrames; }
+	ROBOT_TYPE getTrappedEnemyType() const { return m_TrappedEnemyType; }
 
 private:
 	bool m_Floating{ false };

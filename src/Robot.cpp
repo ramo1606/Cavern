@@ -36,11 +36,11 @@ void Robot::update()
 
 	if (m_Type == ROBOT_TYPE::AGRESSIVE && m_FireTimer >= 24) 
 	{
-		for (auto& orb : Game::getInstance()->getOrbs()) 
+		for (auto orb : Game::getInstance()->getOrbs()) 
 		{
-			if (orb.getPosition().y >= m_Pos.y - getImageRectangle().y / 2 && orb.getPosition().y < m_Pos.y + getImageRectangle().y / 2 && std::abs(orb.getPosition().x - m_Pos.x) < 200)
+			if (orb->getPosition().y >= top() && orb->getPosition().y < bottom() && std::abs(orb->getPosition().x - m_Pos.x) < 200)
 			{
-				m_DirectionX = std::signbit(orb.getPosition().x - m_Pos.x) ? -1 : 1;
+				m_DirectionX = std::signbit(orb->getPosition().x - m_Pos.x) ? -1 : 1;
 				m_FireTimer = 0;
 				break;
 			}
@@ -53,11 +53,7 @@ void Robot::update()
 		Player* player = Game::getInstance()->getPlayer();
 		if (player) 
 		{
-			int robotTop = m_Pos.y - getImageRectangle().height * 0.5f;
-			int robotBottom = m_Pos.y + getImageRectangle().height * 0.5f;
-			int playerTop = player->getPosition().y - player->getImageRectangle().height * 0.5;
-			int playerBottom = player->getPosition().y + player->getImageRectangle().height * 0.5;
-			if (robotTop < playerBottom && robotBottom > playerTop)
+			if (top() < player->bottom() && bottom() > player->top())
 			{
 				fireProbability *= 10;
 			}
@@ -74,17 +70,16 @@ void Robot::update()
 	}
 	else if (m_FireTimer == 8) 
 	{
-		Game::getInstance()->getBolts().push_back(Bolt({ m_Pos.x + m_DirectionX * 20, m_Pos.y}, m_DirectionX));
+		Game::getInstance()->addBolt({ m_Pos.x + m_DirectionX * 20, m_Pos.y }, m_DirectionX);
 	}
 
-	for (auto& orb : Game::getInstance()->getOrbs())
+	for (auto orb : Game::getInstance()->getOrbs())
 	{
-		Rectangle imageRect = getImageRectangle();
-		if (orb.getTrappedEnemyType() == ROBOT_TYPE::NONE && CheckCollisionPointRec(orb.getPosition(), imageRect))
+		if (orb->getTrappedEnemyType() == ROBOT_TYPE::NONE && CheckCollisionPointRec(orb->getPosition(), getActorRectangle()))
 		{
 			m_Alive = false;
-			orb.setFloating(true);
- 			orb.setTrappedEnemyType(m_Type);
+			orb->setFloating(true);
+ 			orb->setTrappedEnemyType(m_Type);
 			Game::getInstance()->playSound(std::string("trap", 4));
 			break;
 		}
@@ -100,5 +95,5 @@ void Robot::update()
 	{
 		image += std::to_string(1 + ((Game::getInstance()->getTimer() / 4) % 4));
 	}
-	setImage(*ResourceManager::getSprite(image));
+	setImage(*ResourceManager::getSprite(image), true);
 }

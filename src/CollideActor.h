@@ -9,10 +9,11 @@ public:
 	CollideActor& operator=(const CollideActor&) = default;
 	virtual ~CollideActor() = default;
 
+	virtual void update() override;
 	bool move(int dx, int dy, int speed);
 
+	float getDirectionX() const { return m_DirectionX; }
 	void setDirectionX(float val) { m_DirectionX = val; }
-	float getDirectionX() { return m_DirectionX; }
 
 protected:
 	float m_DirectionX{ 0.f };

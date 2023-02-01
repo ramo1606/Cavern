@@ -5,7 +5,7 @@
 
 Player::Player(Vector2 pos, Texture2D* image) : GravityActor(pos, image)
 {
-    setImage(*ResourceManager::getSprite(std::string("still")));
+    setImage(*ResourceManager::getSprite(std::string("still")), true);
 }
 
 void Player::update()
@@ -116,8 +116,8 @@ void Player::processInput()
         float y = m_Pos.y - 10;
 
         auto& orbs = Game::getInstance()->getOrbs();
-        orbs.push_back(Orb({ x, y }, m_DirectionX));
-        m_BlowingOrb = &orbs.back();
+        Game::getInstance()->addOrbs({ x, y }, m_DirectionX);
+        m_BlowingOrb = orbs.back();
         Game::getInstance()->playSound(std::string("blow"), 4);
         m_FireTimer = 20;
     }
@@ -139,12 +139,14 @@ void Player::reset()
     m_HurtTimer = 100;
     m_Health = 3;
     m_BlowingOrb = nullptr;
+
+
 }
 
 bool Player::hitTest(CollideActor& other)
 {
     bool returnValue = false;
-    if (CheckCollisionPointRec(other.getPosition(), getImageRectangle()) && m_HurtTimer < 0)
+    if (CheckCollisionPointRec(other.getPosition(), getActorRectangle()) && m_HurtTimer < 0)
     {
         m_HurtTimer = 200;
         m_Health -= 1;

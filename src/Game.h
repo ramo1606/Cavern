@@ -11,6 +11,8 @@
 #include "Orb.h"
 #include "Bolt.h"
 
+#include "rmem.h"
+
 using namespace Common;
 
 class Game
@@ -43,11 +45,13 @@ public:
 	int maxEnemies();
 	int getRobotSpawnX();
 
-	void addPop(Pop&& pop);
-	void addFruit(Fruit&& fruit);
+	void addPop(Vector2 pos, POP_TYPE type = POP_TYPE::FRUIT);
+	void addBolt(Vector2 pos, float dirX);
+	void addOrbs(Vector2 pos, float dirX);
+	void addFruit(Vector2 pos, ROBOT_TYPE trapped_enemy_type = ROBOT_TYPE::NORMAL);
 
-	std::vector<Orb>& getOrbs() { return m_Orbs; }
-	std::vector<Bolt>& getBolts() { return m_Bolts; }
+	std::vector<Orb*>& getOrbs() { return m_Orbs; }
+	std::vector<Bolt*>& getBolts() { return m_Bolts; }
 
 private:
 	Game(Player* player = nullptr);
@@ -60,12 +64,18 @@ private:
 	std::vector<std::string> m_Grid{};
 	std::unique_ptr<Player> m_Player = nullptr;
 
-	std::vector<Fruit> m_Fruits{};
-	std::vector<Robot> m_Enemies{};
-	std::vector<Pop> m_Pops{};
-	std::vector<Orb> m_Orbs{};
-	std::vector<Bolt> m_Bolts{};
+	std::vector<Fruit*> m_Fruits{};
+	std::vector<Robot*> m_Enemies{};
+	std::vector<Pop*> m_Pops{};
+	std::vector<Orb*> m_Orbs{};
+	std::vector<Bolt*> m_Bolts{};
 	std::vector<ROBOT_TYPE> m_PendingEnemies{};
+
+	ObjPool m_FruitsPool = CreateObjPool(sizeof(Fruit), 25);
+	ObjPool m_EnemiesPool = CreateObjPool(sizeof(Robot), 25);
+	ObjPool m_PopsPool = CreateObjPool(sizeof(Pop), 25);
+	ObjPool m_OrbsPool = CreateObjPool(sizeof(Orb), 10);
+	ObjPool m_BoltsPool = CreateObjPool(sizeof(Bolt), 40);
 
 	bool m_SpaceDown{ false };
 };
