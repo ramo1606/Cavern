@@ -5,6 +5,7 @@
 
 Fruit::Fruit(Vector2 pos, ROBOT_TYPE trapped_enemy_type) : GravityActor(pos)
 {
+	// Choose which type of fruit we're going to be.
 	if (trapped_enemy_type == ROBOT_TYPE::NORMAL) 
 	{
 		int select = GetRandomValue(0, 2);
@@ -13,9 +14,16 @@ Fruit::Fruit(Vector2 pos, ROBOT_TYPE trapped_enemy_type) : GravityActor(pos)
 	}
 	else 
 	{
+		/*
+		* If trapped_enemy_type is AGRESSIVE, it means this fruit came from bursting an orb containing the more dangerous type
+        * of enemy. In this case there is a chance of getting an extra help or extra life power up
+        * We create a list containing the possible types of fruit, in proportions based on the probability we want
+        * each type of fruit to be chosen
+		*/
 		std::vector<FRUIT_TYPE> selection = {};
 		for (int i = 0; i < 10; ++i) 
 		{
+			// Each of these appear in the list 10 times
 			selection.push_back(FRUIT_TYPE::APPLE);
 			selection.push_back(FRUIT_TYPE::RASPBERRY);
 			selection.push_back(FRUIT_TYPE::LEMON);
@@ -23,10 +31,14 @@ Fruit::Fruit(Vector2 pos, ROBOT_TYPE trapped_enemy_type) : GravityActor(pos)
 
 		for (int i = 0; i < 9; ++i)
 		{
+			// This appears 9 times
 			selection.push_back(FRUIT_TYPE::EXTRA_HEALTH);
 		}
 
+		// This only appears once
 		selection.push_back(FRUIT_TYPE::EXTRA_LIFE);
+
+		// Randomly choose one from the list
 		m_Type = selection[GetRandomValue(0, selection.size() - 1)];
 	}
 }
@@ -35,6 +47,7 @@ void Fruit::update()
 {
 	GravityActor::update();
 
+	// Does the player exist, and are they colliding with us?
 	Player* gamePlayer = Game::getInstance()->getPlayer();
 	if (gamePlayer && CheckCollisionPointRec(getPosition(), gamePlayer->getActorRectangle()))
 	{
@@ -53,7 +66,7 @@ void Fruit::update()
 			Game::getInstance()->playSound(std::string("score"));
 			break;
 		}
-		m_TimeToLive = 0;
+		m_TimeToLive = 0;	// Disappear
 	}
 	else 
 	{

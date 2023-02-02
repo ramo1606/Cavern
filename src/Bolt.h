@@ -5,6 +5,9 @@ using namespace Common;
 
 constexpr int BOLT_SPEED = 7;
 
+/*
+* Bolt is a CollideActor, this is the class that model a Bolt shooted by enemies. Can collide with blocks, orbs or player
+*/
 class Bolt : public CollideActor
 {
 public:

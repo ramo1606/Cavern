@@ -3,6 +3,9 @@
 
 class Orb;
 
+/*
+* Player class model the main character that we are going to control
+*/
 class Player : public GravityActor 
 {
 public:
@@ -29,8 +32,8 @@ private:
 	int m_Lives{ 2 };
 	int m_Score{ 0 };
 	int m_FireTimer{ 0 };
-	int m_HurtTimer{ 100 };
+	int m_HurtTimer{ 100 };		// Invulnerable for this many frames
 	int m_Health{ 3 };
-	int m_Dx{ 0 };
+	int m_Dx{ 0 };				// -1 = left, 1 = right
 	Orb* m_BlowingOrb{nullptr};
 };

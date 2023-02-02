@@ -16,6 +16,9 @@ enum class State : uint8_t
     GAME_OVER
 };
 
+/*
+* Cavern class will manage the game states
+*/
 class Cavern
 {
 public:
@@ -29,6 +32,7 @@ public:
         switch (m_State)
         {
         case State::MENU:
+            // Switch to play state, and create a init Game object
             if (m_Game->spacePressed())
             {
                 m_State = State::PLAY;
@@ -75,7 +79,17 @@ public:
         {
         case State::MENU:
             {
+                // Draw title screen
                 DrawTexture(*ResourceManager::getSprite(std::string("title")), 0, 0, WHITE);
+
+                /*
+                * Draw "Press SPACE" animation, which has 10 frames numbered 0 to 9
+                * The first part gives us a number between 0 and 159, based on the game timer
+                * Dividing by 4 means we go to a new animation frame every 4 frames
+                * We enclose this calculation in the min function, with the other argument being 9, which results in the
+                * animation staying on frame 9 for three quarters of the time. Adding 40 to the game timer is done to alter
+                * which stage the animation is at when the game first starts
+                */
                 int animFrame = std::min(((m_Game->getTimer() + 40) % 160) / 4, 9);
                 DrawTexture(*ResourceManager::getSprite(std::string("space") + std::to_string(animFrame)), 130, 280, WHITE);
                 break;
@@ -85,6 +99,7 @@ public:
             break;
         case State::GAME_OVER:
             drawStatus();
+            // Display "Game Over" image
             DrawTexture(*ResourceManager::getSprite(std::string("over")), 0, 0, WHITE);
             break;
         default:
@@ -96,12 +111,18 @@ public:
 
     void drawStatus()
     {
+        // Display score, right-justified at edge of screen
         int numberWidth = CHAR_WIDTH[0];
         std::string score = std::to_string(m_Game->getPlayer()->getScore());
         drawText(score, 451, WIDTH - 2 - (numberWidth * score.size()));
 
+        // Display level number
         drawText(std::string("LEVEL ") + std::to_string(m_Game->getLevel() + 1), 451);
 
+        /*
+        * Display lives and health
+        * We only display a maximum of two lives - if there are more than two, a plus symbol is displayed
+        */
         std::vector<std::string> healthImages = {};
 
         for (int i = 0; i < m_Game->getPlayer()->getLives(); ++i) 
@@ -135,6 +156,7 @@ public:
 
     void drawText(std::string& text, int y, int x = -1) 
     {
+        // If no X pos specified, draw text in centre of the screen - must first work out total width of text
         int imageX = x;
         if (x <= -1) 
         {
@@ -155,6 +177,10 @@ public:
 
     int charWidth(char character) 
     {
+        /*
+        * Return width of given character. For characters other than the letters A to Z (i.e. space, and the digits 0 to 9),
+        * the width of the letter A is returned. ord gives the ASCII/Unicode code for the given character.
+        */
         int index = std::max(0, character - 65);
         return CHAR_WIDTH[index];
     }
@@ -169,18 +195,21 @@ private:
 
 int main(void)
 {
+    // Init Raylib
     InitWindow(WIDTH, HEIGHT, TITLE.c_str());
     InitAudioDevice();
     SetTargetFPS(60);
 
-    ResourceManager resourceManager;
-    resourceManager.loadResources();
+    // Load Resources
+    ResourceManager::getInstance()->loadResources();
 
     Cavern cavern;
 
+    // Play music
     PlayMusicStream(*ResourceManager::getMusic(std::string("theme")));
     SetMusicVolume(*ResourceManager::getMusic(std::string("theme")), 0.5f);
 
+    // Main Loop
     while (!WindowShouldClose())
     {
         UpdateMusicStream(*ResourceManager::getMusic(std::string("theme")));
@@ -188,6 +217,8 @@ int main(void)
         cavern.draw();
     }
 
+    //CleanUp and ShutDown
+    ResourceManager::getInstance()->cleanup();
     CloseAudioDevice();
     CloseWindow();
 

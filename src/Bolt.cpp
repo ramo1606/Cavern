@@ -11,12 +11,15 @@ Bolt::Bolt(Vector2 pos, float dirX) : CollideActor(pos)
 
 void Bolt::update()
 {
+	// Move horizontally and check to see if we've collided with a block
 	if (move(m_DirectionX, 0, BOLT_SPEED))
 	{
+		// Collided
 		m_Active = false;
 	}
 	else 
 	{
+		// We didn't collide with a block - check to see if we collided with an orb or the player
 		for (Orb* orb : Game::getInstance()->getOrbs()) 
 		{
 			if (orb->hitTest(*this)) 

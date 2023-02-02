@@ -15,6 +15,9 @@
 
 using namespace Common;
 
+/*
+* Main class for the game logic, it creates and manages all the actors needed in the scene.
+*/
 class Game
 {
 public:
@@ -64,6 +67,7 @@ private:
 	std::vector<std::string> m_Grid{};
 	std::unique_ptr<Player> m_Player = nullptr;
 
+	// Vectors of object pointers.
 	std::vector<Fruit*> m_Fruits{};
 	std::vector<Robot*> m_Enemies{};
 	std::vector<Pop*> m_Pops{};
@@ -71,6 +75,7 @@ private:
 	std::vector<Bolt*> m_Bolts{};
 	std::vector<ROBOT_TYPE> m_PendingEnemies{};
 
+	// Object pools
 	ObjPool m_FruitsPool = CreateObjPool(sizeof(Fruit), 25);
 	ObjPool m_EnemiesPool = CreateObjPool(sizeof(Robot), 25);
 	ObjPool m_PopsPool = CreateObjPool(sizeof(Pop), 25);

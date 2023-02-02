@@ -5,6 +5,7 @@
 
 namespace Common
 {
+    //ENUMS
     enum class FRUIT_TYPE : std::uint8_t
     {
         APPLE,
@@ -27,6 +28,7 @@ namespace Common
         ENEMY
     };
 
+    //CONSTANTS
     const std::string TITLE = "Cavern";
 
     constexpr int WIDTH = 800;
@@ -38,9 +40,11 @@ namespace Common
     constexpr int LEVEL_X_OFFSET = 50;
     constexpr int GRID_BLOCK_SIZE = 25;
 
+    // Widths of the letters A to Z in the font images
     const char CHAR_WIDTH[] = { 27, 26, 25, 26, 25, 25, 26, 25, 12, 26, 26, 25, 33, 25, 26,
                                 25, 27, 26, 26, 25, 26, 26, 38, 25, 25, 25 };
 
+    //LEVELS
     const std::vector<std::vector<std::string>> LEVELS = { {"XXXXX     XXXXXXXX     XXXXX",
                                                             "", "", "", "",
                                                             "   XXXXXXX        XXXXXXX   ",

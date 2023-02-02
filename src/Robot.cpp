@@ -17,6 +17,7 @@ void Robot::update()
 	m_ChangeDirTimer -= 1;
 	m_FireTimer += 1;
 
+	// Move in current direction - turn around if we hit a wall
 	if (move(m_DirectionX, 0, m_Speed)) 
 	{
 		m_ChangeDirTimer = 0;
@@ -24,6 +25,10 @@ void Robot::update()
 
 	if (m_ChangeDirTimer <= 0) 
 	{
+		/*
+		* Randomly choose a direction to move in
+        * If there's a player, there's a two thirds chance that we'll move towards them
+		*/
 		std::vector<int> directions = { -1, 1 };
 		Player* gamePlayer = Game::getInstance()->getPlayer();
 		if (gamePlayer) 
@@ -34,10 +39,13 @@ void Robot::update()
 		m_ChangeDirTimer = GetRandomValue(100, 250);
 	}
 
+	// The more powerful type of robot can deliberately shoot at orbs - turning to face them if necessary
 	if (m_Type == ROBOT_TYPE::AGRESSIVE && m_FireTimer >= 24) 
 	{
+		// Go through all orbs to see if any can be shot at
 		for (auto orb : Game::getInstance()->getOrbs()) 
 		{
+			// The orb must be at our height, and within 200 pixels on the x axis
 			if (orb->getPosition().y >= top() && orb->getPosition().y < bottom() && std::abs(orb->getPosition().x - m_Pos.x) < 200)
 			{
 				m_DirectionX = std::signbit(orb->getPosition().x - m_Pos.x) ? -1 : 1;
@@ -47,8 +55,10 @@ void Robot::update()
 		}
 	}
 
+	// Check to see if we can fire at player
 	if (m_FireTimer >= 12) 
 	{
+		// Random chance of firing each frame. Likelihood increases 10 times if player is at the same height as us
 		float fireProbability = Game::getInstance()->fireProbability();
 		Player* player = Game::getInstance()->getPlayer();
 		if (player) 
@@ -70,9 +80,11 @@ void Robot::update()
 	}
 	else if (m_FireTimer == 8) 
 	{
+		// Once the fire timer has been set to 0, it will count up - frame 8 of the animation is when the actual bolt is fired
 		Game::getInstance()->addBolt({ m_Pos.x + m_DirectionX * 20, m_Pos.y }, m_DirectionX);
 	}
 
+	// Am I colliding with an orb? If so, become trapped by it
 	for (auto orb : Game::getInstance()->getOrbs())
 	{
 		if (orb->getTrappedEnemyType() == ROBOT_TYPE::NONE && CheckCollisionPointRec(orb->getPosition(), getActorRectangle()))
@@ -85,6 +97,7 @@ void Robot::update()
 		}
 	}
 
+	// Choose and set sprite image
 	std::string directionIndex = m_DirectionX > 0 ? std::to_string(1) : std::to_string(0);
 	std::string image = std::string("robot") + std::to_string(static_cast<int>(m_Type)) + directionIndex;
 	if (m_FireTimer < 12) 

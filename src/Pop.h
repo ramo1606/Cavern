@@ -3,6 +3,9 @@
 
 using namespace Common;
 
+/*
+* Pop Animation actor
+*/
 class Pop : public Actor
 {
 public:

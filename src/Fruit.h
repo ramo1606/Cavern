@@ -3,6 +3,9 @@
 
 using namespace Common;
 
+/*
+* Class for pickups including fruit, extra health and extra life
+*/
 class Fruit : public GravityActor
 {
 public:

@@ -3,6 +3,9 @@
 
 constexpr float MAX_FALL_SPEED = 10.f;
 
+/*
+* GravityActor is a CollideActor but is also affected by gravity
+*/
 class GravityActor : public CollideActor
 {
 public:

@@ -1,6 +1,10 @@
 #pragma once
 #include "Actor.h"
 
+/*
+* This class is a child of Actor class, it is basically an actor that will check for 
+* collisions with blocks in the game every time the actor moves.
+*/
 class CollideActor : public Actor 
 {
 public:

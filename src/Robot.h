@@ -3,6 +3,9 @@
 
 using namespace Common;
 
+/*
+* Robot is the enemy class
+*/
 class Robot : public GravityActor
 {
 public:

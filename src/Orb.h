@@ -6,6 +6,9 @@ using namespace Common;
 
 constexpr int MAX_TIMER = 250;
 
+/*
+* Orb is a CollideActor, this is the Orb/Bubble that the character will spawn every time we press space.
+*/
 class Orb : public CollideActor
 {
 public:
@@ -27,7 +30,7 @@ public:
 
 private:
 	bool m_Floating{ false };
-	ROBOT_TYPE m_TrappedEnemyType{ ROBOT_TYPE::NONE };
+	ROBOT_TYPE m_TrappedEnemyType{ ROBOT_TYPE::NONE }; //Which type of enemy is trapped in this bubble
 	int m_Timer{ -1 };
-	int m_BlownFrames{ 6 };
+	int m_BlownFrames{ 6 };		//Number of frames during which we will be pushed horizontally
 };
